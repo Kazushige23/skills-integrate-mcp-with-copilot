@@ -5,7 +5,8 @@ A super simple FastAPI application that allows students to view and sign up for 
 ## Features
 
 - View all available extracurricular activities
-- Sign up for activities
+- Teacher login and logout
+- Teachers can sign up and unregister students
 
 ## Getting Started
 
@@ -30,7 +31,11 @@ A super simple FastAPI application that allows students to view and sign up for 
 | Method | Endpoint                                                          | Description                                                         |
 | ------ | ----------------------------------------------------------------- | ------------------------------------------------------------------- |
 | GET    | `/activities`                                                     | Get all activities with their details and current participant count |
-| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Sign up for an activity                                             |
+| POST   | `/login`                                                          | Start a teacher session                                             |
+| POST   | `/logout`                                                         | End the current teacher session                                    |
+| GET    | `/me`                                                             | Get the logged-in teacher                                          |
+| POST   | `/activities/{activity_name}/signup?email=student@mergington.edu` | Teacher-only student signup                                        |
+| DELETE | `/activities/{activity_name}/unregister?email=student@mergington.edu` | Teacher-only student unregister                                  |
 
 ## Data Model
 
@@ -47,4 +52,4 @@ The application uses a simple data model with meaningful identifiers:
    - Name
    - Grade level
 
-All data is stored in memory, which means data will be reset when the server restarts.
+Activity data and login sessions are stored in memory, which means they will be reset when the server restarts. Teacher usernames and passwords are loaded from `teachers.json`.

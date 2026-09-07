@@ -3,6 +3,27 @@ document.addEventListener("DOMContentLoaded", () => {
   const activitySelect = document.getElementById("activity");
   const signupForm = document.getElementById("signup-form");
   const messageDiv = document.getElementById("message");
+  const loginButton = document.getElementById("login-button");
+  const logoutButton = document.getElementById("logout-button");
+  const loginDialog = document.getElementById("login-dialog");
+  const loginForm = document.getElementById("login-form");
+  const cancelLogin = document.getElementById("cancel-login");
+  const teacherStatus = document.getElementById("teacher-status");
+  const teacherName = document.getElementById("teacher-name");
+  const loginRequired = document.getElementById("login-required");
+  let loggedIn = false;
+
+  function updateAuthUI(username) {
+    loggedIn = Boolean(username);
+    loginButton.classList.toggle("hidden", loggedIn);
+    teacherStatus.classList.toggle("hidden", !loggedIn);
+    loginRequired.classList.toggle("hidden", loggedIn);
+    signupForm.classList.toggle("hidden", !loggedIn);
+    teacherName.textContent = loggedIn ? `Logged in as ${username}` : "";
+    document.querySelectorAll(".delete-btn").forEach((button) => {
+      button.classList.toggle("hidden", !loggedIn);
+    });
+  }
 
   // Function to fetch activities from API
   async function fetchActivities() {
@@ -60,6 +81,7 @@ document.addEventListener("DOMContentLoaded", () => {
       document.querySelectorAll(".delete-btn").forEach((button) => {
         button.addEventListener("click", handleUnregister);
       });
+      updateAuthUI(loggedIn ? teacherName.textContent.replace("Logged in as ", "") : "");
     } catch (error) {
       activitiesList.innerHTML =
         "<p>Failed to load activities. Please try again later.</p>";
@@ -155,6 +177,49 @@ document.addEventListener("DOMContentLoaded", () => {
     }
   });
 
+  loginButton.addEventListener("click", () => loginDialog.showModal());
+  cancelLogin.addEventListener("click", () => loginDialog.close());
+
+  loginForm.addEventListener("submit", async (event) => {
+    event.preventDefault();
+    const response = await fetch("/login", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        username: document.getElementById("username").value,
+        password: document.getElementById("password").value,
+      }),
+    });
+    const result = await response.json();
+    if (!response.ok) {
+      messageDiv.textContent = result.detail || "Login failed";
+      messageDiv.className = "error";
+      messageDiv.classList.remove("hidden");
+      return;
+    }
+    loginForm.reset();
+    loginDialog.close();
+    updateAuthUI(result.username);
+    fetchActivities();
+  });
+
+  logoutButton.addEventListener("click", async () => {
+    await fetch("/logout", { method: "POST" });
+    updateAuthUI("");
+    fetchActivities();
+  });
+
+  async function restoreSession() {
+    const response = await fetch("/me");
+    if (response.ok) {
+      const result = await response.json();
+      updateAuthUI(result.username);
+    } else {
+      updateAuthUI("");
+    }
+  }
+
   // Initialize app
+  restoreSession();
   fetchActivities();
 });
