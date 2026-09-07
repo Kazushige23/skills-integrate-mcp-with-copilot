@@ -16,12 +16,48 @@ body {
 }
 
 header {
+  position: relative;
   text-align: center;
   padding: 20px 0;
   margin-bottom: 30px;
   background-color: #1a237e;
   color: white;
   border-radius: 5px;
+}
+
+#auth-container {
+  margin-top: 15px;
+}
+
+#teacher-status {
+  align-items: center;
+  display: flex;
+  gap: 10px;
+  justify-content: center;
+}
+
+#login-dialog {
+  border: 0;
+  border-radius: 5px;
+  margin: auto;
+  padding: 25px;
+}
+
+#login-dialog::backdrop {
+  background: rgba(0, 0, 0, 0.45);
+}
+
+#login-form {
+  display: grid;
+  gap: 10px;
+  min-width: min(320px, 75vw);
+}
+
+.dialog-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 10px;
 }
 
 header h1 {
